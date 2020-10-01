@@ -6,14 +6,16 @@ TRUNCATE
   thingful_users
   RESTART IDENTITY CASCADE;
 
+
+
 INSERT INTO thingful_users (user_name, full_name, nickname, password)
 VALUES
-  ('dunder', 'Dunder Mifflin', null, 'password'),
-  ('b.deboop', 'Bodeep Deboop', 'Bo', 'bo-password'),
-  ('c.bloggs', 'Charlie Bloggs', 'Charlie', 'charlie-password'),
-  ('s.smith', 'Sam Smith', 'Sam', 'sam-password'),
-  ('lexlor', 'Alex Taylor', 'Lex', 'lex-password'),
-  ('wippy', 'Ping Won In', 'Ping', 'ping-password');
+  ('dunder', 'Dunder Mifflin', null, '$2a$10$Qea6raj8PEkQvVWuUWbByufrG9ytDsKH5YA5hVI9zGCLX9Og/Jd.y'),
+  ('b.deboop', 'Bodeep Deboop', 'Bo', '$2a$10$hTpiIdqNg7wt3Zbp5oZfPuxekJPV9X73sempI.n06uqdb5HaLzUjK'),
+  ('c.bloggs', 'Charlie Bloggs', 'Charlie', '$2a$10$1AJ1APbE70EET931paKQuOyV/XX9SBRC8G2XAlwXt/3/15G7muKDS'),
+  ('s.smith', 'Sam Smith', 'Sam', '$2a$10$aYN4KVCPp3ICTZ10JT2NhOruz4LfVoqk66O/qNtvlTLFSYb.ngnuy'),
+  ('lexlor', 'Alex Taylor', 'Lex', '$2a$10$jZ76am51HGhf3mXxyaZZbexLBM6DvkEmJQSxaKTr7tWX5wCf74Kc6'),
+  ('wippy', 'Ping Won In', 'Ping', '$2a$10$s275PjhQ.TSL6n.mdKE5B.bJIWgi4XH6LE2M1/JC5REaHXbZmeVH6');
 
 INSERT INTO thingful_things (title, image, user_id, content)
 VALUES
