@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 function requireAuth(req, res, next) {
   const authToken = req.get('Authorization') || '';
   let basicToken;
@@ -11,24 +13,38 @@ function requireAuth(req, res, next) {
     .toString()
     .split(':');
 
-  if (!tokenUserName || !tokenPassword) {
+  if (!tokenUserName) {
     return res.status(401).json({ error: 'Unauthorized request' });
   }
-  const db = req.app.get('db');
-  db('thingful_users')
+  req.app
+    .get('db')('thingful_users')
     .select()
-    .then((results) => {
-      const foundUser = results.filter((result) => {
-        return result.user_name === tokenUserName;
-      });
-      const foundPass = results.filter((result) => {
-        return result.password === tokenPassword;
-      });
-      if (foundUser.length === 0 || foundPass.length === 0) {
-        res.status(404).send('Invalid Credentials');
-      }
-      req.user_id = foundUser[0].id;
-      next();
+    .where({ user_name: tokenUserName })
+    .first()
+    .then((result) => {
+      bcrypt
+        .compare(tokenPassword, result.password)
+        .then((passwordsMatch) => {
+          if (!passwordsMatch) {
+            return res.status(401).json({ error: 'Unauthorized request' });
+          }
+        })
+        .then(() => {
+          const db = req.app.get('db');
+          db('thingful_users')
+            .select()
+            .then((results) => {
+              const foundUser = results.filter((result) => {
+                return result.user_name === tokenUserName;
+              });
+              if (foundUser.length === 0) {
+                res.status(404).send('Invalid Credentials');
+              }
+              req.user_id = foundUser[0].id;
+              next();
+            })
+            .catch(next);
+        });
     });
 }
 
