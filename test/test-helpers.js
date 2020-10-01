@@ -235,38 +235,52 @@ function cleanTables(db) {
 }
 
 function seedUsers(db, users) {
-  console.log(users);
   const preppedUsers = users.map((user) => ({
     ...user,
     password: bcrypt.hashSync(user.password, 1),
   }));
-  return db
-    .into('thingful_users')
-    .insert(preppedUsers)
-    .then(() =>
-      // update the auto sequence to stay in sync
-      db.raw(`SELECT setval('thingful_users_id_seq', ?)`, [
-        users[users.length - 1].id,
-      ])
-    );
+  return db.into('thingful_users').insert(preppedUsers);
+  // .then(() =>
+  //   // update the auto sequence to stay in sync
+  //   db
+  //     .raw(`SELECT setval('thingful_users_id_seq', ?)`, [
+  //       users[users.length - 1].id,
+  //     ])
+  //     .then(() => {
+  //       return db('thingful_users')
+  //         .select()
+  //         .then((results) => {
+  //           db.raw('');
+  //         });
+  //     })
+  // );
 }
 
 function seedThingsTables(db, users, things, reviews = []) {
-  return db('thingful_users')
-    .then(() => seedUsers(db, users))
-    .then(() => db.into('thingful_things').insert(things))
-    .then(() =>
-      db.raw(`SELECT setval('thingful_users_id_seq', ?)`, [
-        users[users.length - 1].id,
-      ])
-    )
-    .then(() => reviews.length && db.into('thingful_reviews').insert(reviews));
+  return (
+    db('thingful_users')
+      .then(() => seedUsers(db, users))
+      .then(() => db.into('thingful_things').insert(things))
+      // .then(() =>
+      //   db.raw(`SELECT setval('thingful_users_id_seq', ?)`, [
+      //     users[users.length - 1].id,
+      //   ])
+      // )
+      .then(() => reviews.length && db.into('thingful_reviews').insert(reviews))
+  );
 }
 
 function seedMaliciousThing(db, user, thing) {
   return seedUsers(db, [user]).then(() =>
     db.into('thingful_things').insert([thing])
   );
+}
+
+function makeAuthHeader(user) {
+  const token = Buffer.from(`${user.user_name}:${user.password}`).toString(
+    'base64'
+  );
+  return `Basic ${token}`;
 }
 
 module.exports = {
@@ -276,6 +290,7 @@ module.exports = {
   makeExpectedThingReviews,
   makeMaliciousThing,
   makeReviewsArray,
+  makeAuthHeader,
 
   makeThingsFixtures,
   cleanTables,

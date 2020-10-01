@@ -14,16 +14,16 @@ thingsRouter.route('/').get((req, res, next) => {
 
 thingsRouter
   .route('/:thing_id')
-  .all(basicAuth)
   .all(checkThingExists)
+  .all(basicAuth)
   .get((req, res) => {
     res.json(ThingsService.serializeThing(res.thing));
   });
 
 thingsRouter
   .route('/:thing_id/reviews/')
-  .all(basicAuth)
   .all(checkThingExists)
+  .all(basicAuth)
   .get((req, res, next) => {
     ThingsService.getReviewsForThing(req.app.get('db'), req.params.thing_id)
       .then((reviews) => {
@@ -39,7 +39,6 @@ async function checkThingExists(req, res, next) {
       req.app.get('db'),
       req.params.thing_id
     );
-
     if (!thing)
       return res.status(404).json({
         error: `Thing doesn't exist`,
