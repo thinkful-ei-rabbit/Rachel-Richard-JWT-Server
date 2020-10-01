@@ -26,10 +26,17 @@ describe('Reviews Endpoints', function () {
       helpers.seedThingsTables(db, testUsers, testThings)
     );
 
+<<<<<<< HEAD
     it(`creates an review, responding with 201 and the new review`, function () {
       this.retries(3);
       const testThing = testThings[0];
       const testUser = testUsers[0];
+=======
+    it(`creates an review, responding with 201 and the new review`, function() {
+      this.retries(3)
+      const testThing = testThings[0]
+      const testUser = helpers.seedUsers(db, testUsers)
+>>>>>>> b9d740bb49df90d28359c0ca647c13251c43ef9f
       const newReview = {
         text: 'Test new review',
         rating: 3,
