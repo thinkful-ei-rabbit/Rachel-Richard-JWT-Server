@@ -25,7 +25,6 @@ describe('Reviews Endpoints', function () {
     beforeEach('insert things', () =>
       helpers.seedThingsTables(db, testUsers, testThings)
     );
-
     it(`creates an review, responding with 201 and the new review`, function () {
       this.retries(3);
       const testThing = testThings[0];
