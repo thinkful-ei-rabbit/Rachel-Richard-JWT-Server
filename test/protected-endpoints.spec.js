@@ -1,4 +1,5 @@
 const knex = require('knex');
+const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
@@ -64,6 +65,17 @@ describe('Protected endpoints', function () {
         return endpoint
           .method(endpoint.path)
           .set('Authorization', helpers.makeAuthHeader(userInvalidPass))
+          .expect(401, { error: `Unauthorized request` });
+      });
+      it.only(`responds 401 'Unauthorized request' when invalid JWT secret`, () => {
+        const validUser = testUsers[0];
+        const invalidSecret = 'bad-secret';
+        return endpoint
+          .method(endpoint.path)
+          .set(
+            'Authorization',
+            helpers.makeAuthHeader(validUser, invalidSecret)
+          )
           .expect(401, { error: `Unauthorized request` });
       });
     });
