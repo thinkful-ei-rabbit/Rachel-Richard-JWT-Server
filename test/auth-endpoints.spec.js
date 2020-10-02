@@ -1,7 +1,8 @@
 const knex = require('knex')
-const supertest = require('supertest')
+const jwt = require('jsonwebtoken')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
+const supertest = require('supertest')
 
 describe.only('Auth Endpoints', function () {
     let db
@@ -49,6 +50,35 @@ describe.only('Auth Endpoints', function () {
                         error: `Missing '${field}' in request`
                     })
             })
+        })
+
+        it(`responds with 400 if username invalid`, () => {
+            const invalidUserName = { user_name: 'userinvalid', password: 'existy' }
+            return supertest(app)
+                .post('/api/auth/login')
+                .send(invalidUserName)
+                .expect(400, { error: `Incorrect user_name or password` })
+        })
+
+        it(`responds with 200 JWT auth token using secret when valid credentials`, () => {
+            const validUserCreds = {
+                user_name: testUser.user_name,
+                password: testUser.password
+            }
+            const expectedToken = jwt.sign(
+                { user_id: testUser.id },
+                process.env.JWT_SECRET,
+                {
+                    subject: testUser.user_name,
+                    algorithm: 'HS256'
+                }
+            )
+            return supertest(app)
+                .post('/api/auth/login')
+                .send(validUserCreds)
+                .expect(200, {
+                    authToken: expectedToken
+                })
         })
     })
 })

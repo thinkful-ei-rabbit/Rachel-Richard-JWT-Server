@@ -1,4 +1,5 @@
 const express = require('express')
+const AuthService = require('./auth-service.js')
 
 const authRouter = express.Router()
 const jsonBodyParser = express.json()
@@ -14,9 +15,32 @@ authRouter
                 return res.status(400).json({
                     error: `Missing '${key}' in request`
                 })
+        console.log(loginUser)
+        AuthService.getUserWithUserName(
+            req.app.get('db'),
+            loginUser.user_name
+        )
+            .then(dbUser => {
+                console.log(dbUser)
+                if (!dbUser)
+                    return res.status(400).json({
+                        error: 'Incorrect user_name or password'
+                    })
+                return AuthService.comparePasswords(loginUser.password, dbUser.password)
+                    .then(compareMatch => {
+                        if (!compareMatch)
+                            return res.status(400).json({
+                                error: 'Incorrect user_name or password'
+                            })
+                        const sub = dbUser.user_name
+                        const payload = { user_id: dbUser.id }
+                        res.send({
+                            authToken: AuthService.createJwt(sub, payload)
+                        })
+                    })
+            })
 
-
-        res.send('ok')
+            .catch(next)
     })
 
 module.exports = authRouter;
