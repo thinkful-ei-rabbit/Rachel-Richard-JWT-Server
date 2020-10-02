@@ -46,7 +46,7 @@ describe.only('Auth Endpoints', function () {
                     .post('/api/auth/login')
                     .send(loginAttemptBody)
                     .expect(400, {
-                        error: `Missing '${field}' in request body`
+                        error: `Missing '${field}' in request`
                     })
             })
         })
