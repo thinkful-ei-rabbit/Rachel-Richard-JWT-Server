@@ -37,7 +37,10 @@ describe('Reviews Endpoints', function () {
       };
       return supertest(app)
         .post('/api/reviews')
-        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .set(
+          'Authorization',
+          helpers.makeAuthHeader(testUser, process.env.JWT_SECRET)
+        )
         .send(newReview)
         .expect(201)
         .expect((res) => {
